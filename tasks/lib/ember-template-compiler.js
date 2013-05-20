@@ -36,24 +36,38 @@ this.Handlebars = {};
 
 (function(Handlebars) {
 
-Handlebars.VERSION = "1.0.0-rc.3";
-Handlebars.COMPILER_REVISION = 2;
+Handlebars.VERSION = "1.0.0-rc.4";
+Handlebars.COMPILER_REVISION = 3;
 
 Handlebars.REVISION_CHANGES = {
   1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
-  2: '>= 1.0.0-rc.3'
+  2: '== 1.0.0-rc.3',
+  3: '>= 1.0.0-rc.4'
 };
 
 Handlebars.helpers  = {};
 Handlebars.partials = {};
 
+var toString = Object.prototype.toString,
+    functionType = '[object Function]',
+    objectType = '[object Object]';
+
 Handlebars.registerHelper = function(name, fn, inverse) {
-  if(inverse) { fn.not = inverse; }
-  this.helpers[name] = fn;
+  if (toString.call(name) === objectType) {
+    if (inverse || fn) { throw new Handlebars.Exception('Arg not supported with multiple helpers'); }
+    Handlebars.Utils.extend(this.helpers, name);
+  } else {
+    if (inverse) { fn.not = inverse; }
+    this.helpers[name] = fn;
+  }
 };
 
 Handlebars.registerPartial = function(name, str) {
-  this.partials[name] = str;
+  if (toString.call(name) === objectType) {
+    Handlebars.Utils.extend(this.partials,  name);
+  } else {
+    this.partials[name] = str;
+  }
 };
 
 Handlebars.registerHelper('helperMissing', function(arg) {
@@ -64,13 +78,9 @@ Handlebars.registerHelper('helperMissing', function(arg) {
   }
 });
 
-var toString = Object.prototype.toString, functionType = "[object Function]";
-
 Handlebars.registerHelper('blockHelperMissing', function(context, options) {
   var inverse = options.inverse || function() {}, fn = options.fn;
 
-
-  var ret = "";
   var type = toString.call(context);
 
   if(type === functionType) { context = context.call(this); }
@@ -161,15 +171,11 @@ Handlebars.registerHelper('if', function(context, options) {
 });
 
 Handlebars.registerHelper('unless', function(context, options) {
-  var fn = options.fn, inverse = options.inverse;
-  options.fn = inverse;
-  options.inverse = fn;
-
-  return Handlebars.helpers['if'].call(this, context, options);
+  return Handlebars.helpers['if'].call(this, context, {fn: options.inverse, inverse: options.fn});
 });
 
 Handlebars.registerHelper('with', function(context, options) {
-  return options.fn(context);
+  if (!Handlebars.Utils.isEmpty(context)) return options.fn(context);
 });
 
 Handlebars.registerHelper('log', function(context, options) {
@@ -191,99 +197,99 @@ performAction: function anonymous(yytext,yyleng,yylineno,yy,yystate,$$,_$) {
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1: return $$[$0-1]; 
+case 1: return $$[$0-1];
 break;
-case 2: this.$ = new yy.ProgramNode([], $$[$0]); 
+case 2: this.$ = new yy.ProgramNode([], $$[$0]);
 break;
-case 3: this.$ = new yy.ProgramNode($$[$0-2], $$[$0]); 
+case 3: this.$ = new yy.ProgramNode($$[$0-2], $$[$0]);
 break;
-case 4: this.$ = new yy.ProgramNode($$[$0-1], []); 
+case 4: this.$ = new yy.ProgramNode($$[$0-1], []);
 break;
-case 5: this.$ = new yy.ProgramNode($$[$0]); 
+case 5: this.$ = new yy.ProgramNode($$[$0]);
 break;
-case 6: this.$ = new yy.ProgramNode([], []); 
+case 6: this.$ = new yy.ProgramNode([], []);
 break;
-case 7: this.$ = new yy.ProgramNode([]); 
+case 7: this.$ = new yy.ProgramNode([]);
 break;
-case 8: this.$ = [$$[$0]]; 
+case 8: this.$ = [$$[$0]];
 break;
-case 9: $$[$0-1].push($$[$0]); this.$ = $$[$0-1]; 
+case 9: $$[$0-1].push($$[$0]); this.$ = $$[$0-1];
 break;
-case 10: this.$ = new yy.BlockNode($$[$0-2], $$[$0-1].inverse, $$[$0-1], $$[$0]); 
+case 10: this.$ = new yy.BlockNode($$[$0-2], $$[$0-1].inverse, $$[$0-1], $$[$0]);
 break;
-case 11: this.$ = new yy.BlockNode($$[$0-2], $$[$0-1], $$[$0-1].inverse, $$[$0]); 
+case 11: this.$ = new yy.BlockNode($$[$0-2], $$[$0-1], $$[$0-1].inverse, $$[$0]);
 break;
-case 12: this.$ = $$[$0]; 
+case 12: this.$ = $$[$0];
 break;
-case 13: this.$ = $$[$0]; 
+case 13: this.$ = $$[$0];
 break;
-case 14: this.$ = new yy.ContentNode($$[$0]); 
+case 14: this.$ = new yy.ContentNode($$[$0]);
 break;
-case 15: this.$ = new yy.CommentNode($$[$0]); 
+case 15: this.$ = new yy.CommentNode($$[$0]);
 break;
-case 16: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1]); 
+case 16: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1]);
 break;
-case 17: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1]); 
+case 17: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1]);
 break;
-case 18: this.$ = $$[$0-1]; 
+case 18: this.$ = $$[$0-1];
 break;
-case 19: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1]); 
+case 19: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1]);
 break;
-case 20: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1], true); 
+case 20: this.$ = new yy.MustacheNode($$[$0-1][0], $$[$0-1][1], true);
 break;
-case 21: this.$ = new yy.PartialNode($$[$0-1]); 
+case 21: this.$ = new yy.PartialNode($$[$0-1]);
 break;
-case 22: this.$ = new yy.PartialNode($$[$0-2], $$[$0-1]); 
+case 22: this.$ = new yy.PartialNode($$[$0-2], $$[$0-1]);
 break;
-case 23: 
+case 23:
 break;
-case 24: this.$ = [[$$[$0-2]].concat($$[$0-1]), $$[$0]]; 
+case 24: this.$ = [[$$[$0-2]].concat($$[$0-1]), $$[$0]];
 break;
-case 25: this.$ = [[$$[$0-1]].concat($$[$0]), null]; 
+case 25: this.$ = [[$$[$0-1]].concat($$[$0]), null];
 break;
-case 26: this.$ = [[$$[$0-1]], $$[$0]]; 
+case 26: this.$ = [[$$[$0-1]], $$[$0]];
 break;
-case 27: this.$ = [[$$[$0]], null]; 
+case 27: this.$ = [[$$[$0]], null];
 break;
-case 28: this.$ = [[new yy.DataNode($$[$0])], null]; 
+case 28: this.$ = [[new yy.DataNode($$[$0])], null];
 break;
-case 29: $$[$0-1].push($$[$0]); this.$ = $$[$0-1]; 
+case 29: $$[$0-1].push($$[$0]); this.$ = $$[$0-1];
 break;
-case 30: this.$ = [$$[$0]]; 
+case 30: this.$ = [$$[$0]];
 break;
-case 31: this.$ = $$[$0]; 
+case 31: this.$ = $$[$0];
 break;
-case 32: this.$ = new yy.StringNode($$[$0]); 
+case 32: this.$ = new yy.StringNode($$[$0]);
 break;
-case 33: this.$ = new yy.IntegerNode($$[$0]); 
+case 33: this.$ = new yy.IntegerNode($$[$0]);
 break;
-case 34: this.$ = new yy.BooleanNode($$[$0]); 
+case 34: this.$ = new yy.BooleanNode($$[$0]);
 break;
-case 35: this.$ = new yy.DataNode($$[$0]); 
+case 35: this.$ = new yy.DataNode($$[$0]);
 break;
-case 36: this.$ = new yy.HashNode($$[$0]); 
+case 36: this.$ = new yy.HashNode($$[$0]);
 break;
-case 37: $$[$0-1].push($$[$0]); this.$ = $$[$0-1]; 
+case 37: $$[$0-1].push($$[$0]); this.$ = $$[$0-1];
 break;
-case 38: this.$ = [$$[$0]]; 
+case 38: this.$ = [$$[$0]];
 break;
-case 39: this.$ = [$$[$0-2], $$[$0]]; 
+case 39: this.$ = [$$[$0-2], $$[$0]];
 break;
-case 40: this.$ = [$$[$0-2], new yy.StringNode($$[$0])]; 
+case 40: this.$ = [$$[$0-2], new yy.StringNode($$[$0])];
 break;
-case 41: this.$ = [$$[$0-2], new yy.IntegerNode($$[$0])]; 
+case 41: this.$ = [$$[$0-2], new yy.IntegerNode($$[$0])];
 break;
-case 42: this.$ = [$$[$0-2], new yy.BooleanNode($$[$0])]; 
+case 42: this.$ = [$$[$0-2], new yy.BooleanNode($$[$0])];
 break;
-case 43: this.$ = [$$[$0-2], new yy.DataNode($$[$0])]; 
+case 43: this.$ = [$$[$0-2], new yy.DataNode($$[$0])];
 break;
-case 44: this.$ = new yy.PartialNameNode($$[$0]); 
+case 44: this.$ = new yy.PartialNameNode($$[$0]);
 break;
-case 45: this.$ = new yy.IdNode($$[$0]); 
+case 45: this.$ = new yy.IdNode($$[$0]);
 break;
-case 46: $$[$0-2].push($$[$0]); this.$ = $$[$0-2]; 
+case 46: $$[$0-2].push($$[$0]); this.$ = $$[$0-2];
 break;
-case 47: this.$ = [$$[$0]]; 
+case 47: this.$ = [$$[$0]];
 break;
 }
 },
@@ -573,75 +579,75 @@ case 0:
                                    if(yy_.yytext.slice(-1) !== "\\") this.begin("mu");
                                    if(yy_.yytext.slice(-1) === "\\") yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-1), this.begin("emu");
                                    if(yy_.yytext) return 14;
-                                 
+
 break;
-case 1: return 14; 
+case 1: return 14;
 break;
 case 2:
                                    if(yy_.yytext.slice(-1) !== "\\") this.popState();
                                    if(yy_.yytext.slice(-1) === "\\") yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-1);
                                    return 14;
-                                 
+
 break;
-case 3: yy_.yytext = yy_.yytext.substr(0, yy_.yyleng-4); this.popState(); return 15; 
+case 3: yy_.yytext = yy_.yytext.substr(0, yy_.yyleng-4); this.popState(); return 15;
 break;
-case 4: this.begin("par"); return 24; 
+case 4: this.begin("par"); return 24;
 break;
-case 5: return 16; 
+case 5: return 16;
 break;
-case 6: return 20; 
+case 6: return 20;
 break;
-case 7: return 19; 
+case 7: return 19;
 break;
-case 8: return 19; 
+case 8: return 19;
 break;
-case 9: return 23; 
+case 9: return 23;
 break;
-case 10: return 23; 
+case 10: return 23;
 break;
-case 11: this.popState(); this.begin('com'); 
+case 11: this.popState(); this.begin('com');
 break;
-case 12: yy_.yytext = yy_.yytext.substr(3,yy_.yyleng-5); this.popState(); return 15; 
+case 12: yy_.yytext = yy_.yytext.substr(3,yy_.yyleng-5); this.popState(); return 15;
 break;
-case 13: return 22; 
+case 13: return 22;
 break;
-case 14: return 36; 
+case 14: return 36;
 break;
-case 15: return 35; 
+case 15: return 35;
 break;
-case 16: return 35; 
+case 16: return 35;
 break;
-case 17: return 39; 
+case 17: return 39;
 break;
-case 18: /*ignore whitespace*/ 
+case 18: /*ignore whitespace*/
 break;
-case 19: this.popState(); return 18; 
+case 19: this.popState(); return 18;
 break;
-case 20: this.popState(); return 18; 
+case 20: this.popState(); return 18;
 break;
-case 21: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2).replace(/\\"/g,'"'); return 30; 
+case 21: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2).replace(/\\"/g,'"'); return 30;
 break;
-case 22: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2).replace(/\\'/g,"'"); return 30; 
+case 22: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2).replace(/\\'/g,"'"); return 30;
 break;
-case 23: yy_.yytext = yy_.yytext.substr(1); return 28; 
+case 23: yy_.yytext = yy_.yytext.substr(1); return 28;
 break;
-case 24: return 32; 
+case 24: return 32;
 break;
-case 25: return 32; 
+case 25: return 32;
 break;
-case 26: return 31; 
+case 26: return 31;
 break;
-case 27: return 35; 
+case 27: return 35;
 break;
-case 28: yy_.yytext = yy_.yytext.substr(1, yy_.yyleng-2); return 35; 
+case 28: yy_.yytext = yy_.yytext.substr(1, yy_.yyleng-2); return 35;
 break;
-case 29: return 'INVALID'; 
+case 29: return 'INVALID';
 break;
-case 30: /*ignore whitespace*/ 
+case 30: /*ignore whitespace*/
 break;
-case 31: this.popState(); return 37; 
+case 31: this.popState(); return 37;
 break;
-case 32: return 5; 
+case 32: return 5;
 break;
 }
 };
@@ -670,130 +676,130 @@ Handlebars.print = function(ast) {
 // lib/handlebars/compiler/ast.js
 (function() {
 
-  Handlebars.AST = {};
+Handlebars.AST = {};
 
-  Handlebars.AST.ProgramNode = function(statements, inverse) {
-    this.type = "program";
-    this.statements = statements;
-    if(inverse) { this.inverse = new Handlebars.AST.ProgramNode(inverse); }
-  };
+Handlebars.AST.ProgramNode = function(statements, inverse) {
+  this.type = "program";
+  this.statements = statements;
+  if(inverse) { this.inverse = new Handlebars.AST.ProgramNode(inverse); }
+};
 
-  Handlebars.AST.MustacheNode = function(rawParams, hash, unescaped) {
-    this.type = "mustache";
-    this.escaped = !unescaped;
-    this.hash = hash;
+Handlebars.AST.MustacheNode = function(rawParams, hash, unescaped) {
+  this.type = "mustache";
+  this.escaped = !unescaped;
+  this.hash = hash;
 
-    var id = this.id = rawParams[0];
-    var params = this.params = rawParams.slice(1);
+  var id = this.id = rawParams[0];
+  var params = this.params = rawParams.slice(1);
 
-    // a mustache is an eligible helper if:
-    // * its id is simple (a single part, not `this` or `..`)
-    var eligibleHelper = this.eligibleHelper = id.isSimple;
+  // a mustache is an eligible helper if:
+  // * its id is simple (a single part, not `this` or `..`)
+  var eligibleHelper = this.eligibleHelper = id.isSimple;
 
-    // a mustache is definitely a helper if:
-    // * it is an eligible helper, and
-    // * it has at least one parameter or hash segment
-    this.isHelper = eligibleHelper && (params.length || hash);
+  // a mustache is definitely a helper if:
+  // * it is an eligible helper, and
+  // * it has at least one parameter or hash segment
+  this.isHelper = eligibleHelper && (params.length || hash);
 
-    // if a mustache is an eligible helper but not a definite
-    // helper, it is ambiguous, and will be resolved in a later
-    // pass or at runtime.
-  };
+  // if a mustache is an eligible helper but not a definite
+  // helper, it is ambiguous, and will be resolved in a later
+  // pass or at runtime.
+};
 
-  Handlebars.AST.PartialNode = function(partialName, context) {
-    this.type         = "partial";
-    this.partialName  = partialName;
-    this.context      = context;
-  };
+Handlebars.AST.PartialNode = function(partialName, context) {
+  this.type         = "partial";
+  this.partialName  = partialName;
+  this.context      = context;
+};
 
+Handlebars.AST.BlockNode = function(mustache, program, inverse, close) {
   var verifyMatch = function(open, close) {
     if(open.original !== close.original) {
       throw new Handlebars.Exception(open.original + " doesn't match " + close.original);
     }
   };
 
-  Handlebars.AST.BlockNode = function(mustache, program, inverse, close) {
-    verifyMatch(mustache.id, close);
-    this.type = "block";
-    this.mustache = mustache;
-    this.program  = program;
-    this.inverse  = inverse;
+  verifyMatch(mustache.id, close);
+  this.type = "block";
+  this.mustache = mustache;
+  this.program  = program;
+  this.inverse  = inverse;
 
-    if (this.inverse && !this.program) {
-      this.isInverse = true;
+  if (this.inverse && !this.program) {
+    this.isInverse = true;
+  }
+};
+
+Handlebars.AST.ContentNode = function(string) {
+  this.type = "content";
+  this.string = string;
+};
+
+Handlebars.AST.HashNode = function(pairs) {
+  this.type = "hash";
+  this.pairs = pairs;
+};
+
+Handlebars.AST.IdNode = function(parts) {
+  this.type = "ID";
+  this.original = parts.join(".");
+
+  var dig = [], depth = 0;
+
+  for(var i=0,l=parts.length; i<l; i++) {
+    var part = parts[i];
+
+    if (part === ".." || part === "." || part === "this") {
+      if (dig.length > 0) { throw new Handlebars.Exception("Invalid path: " + this.original); }
+      else if (part === "..") { depth++; }
+      else { this.isScoped = true; }
     }
-  };
+    else { dig.push(part); }
+  }
 
-  Handlebars.AST.ContentNode = function(string) {
-    this.type = "content";
-    this.string = string;
-  };
+  this.parts    = dig;
+  this.string   = dig.join('.');
+  this.depth    = depth;
 
-  Handlebars.AST.HashNode = function(pairs) {
-    this.type = "hash";
-    this.pairs = pairs;
-  };
+  // an ID is simple if it only has one part, and that part is not
+  // `..` or `this`.
+  this.isSimple = parts.length === 1 && !this.isScoped && depth === 0;
 
-  Handlebars.AST.IdNode = function(parts) {
-    this.type = "ID";
-    this.original = parts.join(".");
+  this.stringModeValue = this.string;
+};
 
-    var dig = [], depth = 0;
+Handlebars.AST.PartialNameNode = function(name) {
+  this.type = "PARTIAL_NAME";
+  this.name = name;
+};
 
-    for(var i=0,l=parts.length; i<l; i++) {
-      var part = parts[i];
+Handlebars.AST.DataNode = function(id) {
+  this.type = "DATA";
+  this.id = id;
+};
 
-      if (part === ".." || part === "." || part === "this") {
-        if (dig.length > 0) { throw new Handlebars.Exception("Invalid path: " + this.original); }
-        else if (part === "..") { depth++; }
-        else { this.isScoped = true; }
-      }
-      else { dig.push(part); }
-    }
+Handlebars.AST.StringNode = function(string) {
+  this.type = "STRING";
+  this.string = string;
+  this.stringModeValue = string;
+};
 
-    this.parts    = dig;
-    this.string   = dig.join('.');
-    this.depth    = depth;
+Handlebars.AST.IntegerNode = function(integer) {
+  this.type = "INTEGER";
+  this.integer = integer;
+  this.stringModeValue = Number(integer);
+};
 
-    // an ID is simple if it only has one part, and that part is not
-    // `..` or `this`.
-    this.isSimple = parts.length === 1 && !this.isScoped && depth === 0;
+Handlebars.AST.BooleanNode = function(bool) {
+  this.type = "BOOLEAN";
+  this.bool = bool;
+  this.stringModeValue = bool === "true";
+};
 
-    this.stringModeValue = this.string;
-  };
-
-  Handlebars.AST.PartialNameNode = function(name) {
-    this.type = "PARTIAL_NAME";
-    this.name = name;
-  };
-
-  Handlebars.AST.DataNode = function(id) {
-    this.type = "DATA";
-    this.id = id;
-  };
-
-  Handlebars.AST.StringNode = function(string) {
-    this.type = "STRING";
-    this.string = string;
-    this.stringModeValue = string;
-  };
-
-  Handlebars.AST.IntegerNode = function(integer) {
-    this.type = "INTEGER";
-    this.integer = integer;
-    this.stringModeValue = Number(integer);
-  };
-
-  Handlebars.AST.BooleanNode = function(bool) {
-    this.type = "BOOLEAN";
-    this.bool = bool;
-    this.stringModeValue = bool === "true";
-  };
-
-  Handlebars.AST.CommentNode = function(comment) {
-    this.type = "comment";
-    this.comment = comment;
-  };
+Handlebars.AST.CommentNode = function(comment) {
+  this.type = "comment";
+  this.comment = comment;
+};
 
 })();;
 // lib/handlebars/utils.js

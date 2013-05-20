@@ -9,7 +9,7 @@ describe('A compiled template', function() {
   before(function(done) {
     var vendorDir      = __dirname + '/vendor',
         jQueryJs       = grunt.file.read(vendorDir + '/jquery-1.9.0.js', 'utf8'),
-        handlebarsJs   = grunt.file.read(vendorDir + '/handlebars-1.0.rc.3.js', 'utf8'),
+        handlebarsJs   = grunt.file.read(vendorDir + '/handlebars-1.0.rc.4.js', 'utf8'),
         emberJs        = grunt.file.read(vendorDir + '/ember.js', 'utf8'),
         exampleFile    = grunt.file.read('test/example.handlebars'),
         compiledSrc    = precompiler.precompile(exampleFile),
